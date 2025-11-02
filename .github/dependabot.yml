@@ -1,64 +1,112 @@
 version: 2
 
 updates:
-  # Backend dependencies
+  # --------------------------
+  # BACKEND (npm)
+  # --------------------------
   - package-ecosystem: "npm"
     directory: "/BACKEND"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "09:00"
+      time: "12:00"        # 09:00 Chile ≈ 12:00 UTC
     open-pull-requests-limit: 10
     reviewers:
-      - "github-username"  # Reemplazar con tu usuario
+      - "serarayaa"
     labels:
       - "dependencies"
       - "backend"
+      - "security"
     commit-message:
       prefix: "chore(backend)"
       include: "scope"
     versioning-strategy: increase
+    # Agrupar para reducir ruido
+    groups:
+      backend-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      backend-security:
+        applies-to: security-updates
 
-  # Frontend dependencies
+  # --------------------------
+  # FRONTEND (npm)
+  # --------------------------
   - package-ecosystem: "npm"
     directory: "/FRONTEND/depilaciones-debby"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "09:00"
+      time: "12:00"        # UTC
     open-pull-requests-limit: 10
     reviewers:
-      - "github-username"  # Reemplazar con tu usuario
+      - "serarayaa"
     labels:
       - "dependencies"
       - "frontend"
+      - "security"
     commit-message:
       prefix: "chore(frontend)"
       include: "scope"
     versioning-strategy: increase
+    groups:
+      frontend-minor-patch:
+        applies-to: version-updates
+        update-types:
+          - "minor"
+          - "patch"
+      frontend-security:
+        applies-to: security-updates
 
-  # Docker base images
+  # --------------------------
+  # DOCKER (imágenes base)
+  # --------------------------
   - package-ecosystem: "docker"
     directory: "/BACKEND"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "12:00"
     labels:
       - "dependencies"
       - "docker"
+      - "security"
+    groups:
+      docker-weekly:
+        applies-to: version-updates
+        patterns: ["*"]
 
   - package-ecosystem: "docker"
     directory: "/FRONTEND/depilaciones-debby"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "12:00"
     labels:
       - "dependencies"
       - "docker"
+      - "security"
+    groups:
+      docker-weekly:
+        applies-to: version-updates
+        patterns: ["*"]
 
-  # GitHub Actions
+  # --------------------------
+  # GITHUB ACTIONS
+  # --------------------------
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "12:00"
     labels:
       - "dependencies"
       - "github-actions"
+      - "security"
+    groups:
+      actions-weekly:
+        applies-to: version-updates
+        patterns: ["*"]
