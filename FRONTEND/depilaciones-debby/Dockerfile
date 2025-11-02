@@ -1,34 +1,29 @@
-# Etapa 1: Build
-FROM node:18-alpine AS builder
+# ---------- Stage 1: Build ----------
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Instala deps con caché eficiente
 COPY package*.json ./
-
-# Instalar dependencias
 RUN npm ci
 
-# Copiar código fuente
+# Copia el resto y compila
 COPY . .
-
-# Build de producción
 RUN npm run build
 
-# Etapa 2: Producción con Nginx
+# ---------- Stage 2: Runtime (Nginx) ----------
 FROM nginx:alpine
 
-# Copiar build desde la etapa anterior
-COPY --from=builder /app/dist /usr/share/nginx/html
+# Copia el build
+COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copiar configuración personalizada de Nginx
+# Config SPA + gzip + cache
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Exponer puerto
 EXPOSE 80
 
-# Health check
+# Healthcheck del servidor
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:80 || exit 1
+  CMD wget -q -T 2 -O /dev/null http://localhost/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

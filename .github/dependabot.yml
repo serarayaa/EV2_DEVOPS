@@ -1,52 +1,39 @@
 version: 2
 
 updates:
-  # --------------------------
   # BACKEND (npm)
-  # --------------------------
   - package-ecosystem: "npm"
     directory: "/BACKEND"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "12:00"        # 09:00 Chile ≈ 12:00 UTC
+      time: "12:00"   # 09:00 Chile ≈ 12:00 UTC
     open-pull-requests-limit: 10
     reviewers:
       - "serarayaa"
-    labels:
-      - "dependencies"
-      - "backend"
-      - "security"
+    labels: ["dependencies", "backend", "security"]
     commit-message:
       prefix: "chore(backend)"
       include: "scope"
     versioning-strategy: increase
-    # Agrupar para reducir ruido
     groups:
       backend-minor-patch:
         applies-to: version-updates
-        update-types:
-          - "minor"
-          - "patch"
+        update-types: ["minor", "patch"]
       backend-security:
         applies-to: security-updates
 
-  # --------------------------
   # FRONTEND (npm)
-  # --------------------------
   - package-ecosystem: "npm"
     directory: "/FRONTEND/depilaciones-debby"
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "12:00"        # UTC
+      time: "12:00"
     open-pull-requests-limit: 10
     reviewers:
       - "serarayaa"
-    labels:
-      - "dependencies"
-      - "frontend"
-      - "security"
+    labels: ["dependencies", "frontend", "security"]
     commit-message:
       prefix: "chore(frontend)"
       include: "scope"
@@ -54,25 +41,18 @@ updates:
     groups:
       frontend-minor-patch:
         applies-to: version-updates
-        update-types:
-          - "minor"
-          - "patch"
+        update-types: ["minor", "patch"]
       frontend-security:
         applies-to: security-updates
 
-  # --------------------------
   # DOCKER (imágenes base)
-  # --------------------------
   - package-ecosystem: "docker"
     directory: "/BACKEND"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "12:00"
-    labels:
-      - "dependencies"
-      - "docker"
-      - "security"
+    labels: ["dependencies", "docker", "security"]
     groups:
       docker-weekly:
         applies-to: version-updates
@@ -84,28 +64,20 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "12:00"
-    labels:
-      - "dependencies"
-      - "docker"
-      - "security"
+    labels: ["dependencies", "docker", "security"]
     groups:
       docker-weekly:
         applies-to: version-updates
         patterns: ["*"]
 
-  # --------------------------
   # GITHUB ACTIONS
-  # --------------------------
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "12:00"
-    labels:
-      - "dependencies"
-      - "github-actions"
-      - "security"
+    labels: ["dependencies", "github-actions", "security"]
     groups:
       actions-weekly:
         applies-to: version-updates

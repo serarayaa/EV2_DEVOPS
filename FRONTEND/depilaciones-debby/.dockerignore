@@ -1,32 +1,13 @@
-# Dependencies
 node_modules
 dist
-
-# Testing
-coverage
-
-# Environment
-.env
-.env.local
-.env.*.local
-
-# Build
-dist-ssr
-*.local
-
-# IDE
+npm-debug.log
+pnpm-lock.yaml
+yarn.lock
 .vscode
-.idea
-
-# Documentation
-README.md
-*.md
-
-# CI/CD
-.github
-.gitlab-ci.yml
-
-# Docker
-Dockerfile
-.dockerignore
-nginx.conf
+.DS_Store
+.git
+.gitignore
+coverage
+*.local
+.env
+.env.*
