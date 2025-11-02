@@ -70,15 +70,15 @@ updates:
         applies-to: version-updates
         patterns: ["*"]
 
-  # GITHUB ACTIONS
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "12:00"
-    labels: ["dependencies", "github-actions", "security"]
-    groups:
-      actions-weekly:
-        applies-to: version-updates
-        patterns: ["*"]
+  # GITHUB ACTIONS - Deshabilitado temporalmente (las versiones actuales funcionan)
+  # - package-ecosystem: "github-actions"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "weekly"
+  #     day: "monday"
+  #     time: "12:00"
+  #   labels: ["dependencies", "github-actions", "security"]
+  #   groups:
+  #     actions-weekly:
+  #       applies-to: version-updates
+  #       patterns: ["*"]
