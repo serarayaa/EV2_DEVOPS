@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+dist
+
+# Testing
+coverage
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+dist-ssr
+*.local
+
+# IDE
+.vscode
+.idea
+
+# Documentation
+README.md
+*.md
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Docker
+Dockerfile
+.dockerignore
+nginx.conf

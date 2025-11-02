@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: depilaciones-mongodb-dev
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_dev_data:/data/db
+    networks:
+      - dev-network
+
+  backend:
+    build:
+      context: ./BACKEND
+      dockerfile: Dockerfile
+    container_name: depilaciones-backend-dev
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://mongodb:27017/depilaciones-debby
+      CORS_ORIGIN: http://localhost:5173
+    volumes:
+      - ./BACKEND/src:/app/src
+      - ./BACKEND/package.json:/app/package.json
+    command: npm run dev
+    depends_on:
+      - mongodb
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    name: depilaciones-dev-network
+
+volumes:
+  mongodb_dev_data:
+    name: depilaciones-mongodb-dev-data
