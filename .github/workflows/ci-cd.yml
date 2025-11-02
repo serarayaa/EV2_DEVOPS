@@ -18,12 +18,11 @@ jobs:
   test-backend:
     name: 🧪 Backend Tests
     runs-on: ubuntu-latest
-    
+
     services:
       mongodb:
         image: mongo:7.0
-        ports:
-          - 27017:27017
+        ports: [ "27017:27017" ]
         options: >-
           --health-cmd "mongosh --eval 'db.adminCommand({ping: 1})'"
           --health-interval 10s
@@ -94,10 +93,11 @@ jobs:
         run: npm run build
 
   # ========================================
-  # JOB 3: SECURITY SCAN - SNYK
+  # JOB 3: SECURITY SCAN - SNYK (DEPENDENCIAS)
+  # Falla el job si hay HIGH/CRITICAL
   # ========================================
   security-scan:
-    name: 🔒 Security Scan
+    name: 🔒 Snyk Dependency Scan
     runs-on: ubuntu-latest
     needs: [test-backend, test-frontend]
 
@@ -105,23 +105,83 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔍 Run Snyk Security Scan - Backend
+      # BACKEND
+      - name: 🔍 Snyk test (backend) – fail on HIGH
         uses: snyk/actions/node@master
-        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --file=BACKEND/package.json
-          command: test
+          args: test --severity-threshold=high
+        working-directory: ./BACKEND
 
-      - name: 🔍 Run Snyk Security Scan - Frontend
+      - name: 📡 Snyk monitor (backend)
+        uses: snyk/actions/setup@master
+      - run: snyk monitor
+        working-directory: ./BACKEND
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # FRONTEND
+      - name: 🔍 Snyk test (frontend) – fail on HIGH
         uses: snyk/actions/node@master
-        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --file=FRONTEND/depilaciones-debby/package.json
-          command: test
+          args: test --severity-threshold=high
+        working-directory: ./FRONTEND/depilaciones-debby
+
+      - name: 📡 Snyk monitor (frontend)
+        run: snyk monitor
+        working-directory: ./FRONTEND/depilaciones-debby
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+  # ========================================
+  # JOB 3.5: SNYK CONTAINER SCAN (IMÁGENES)
+  # Construye local, escanea y monitorea ANTES de publicar
+  # ========================================
+  snyk-container:
+    name: 🐳 Snyk Container Scan
+    runs-on: ubuntu-latest
+    needs: [security-scan]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image (local)
+        run: docker build -t ev2-backend:ci ./BACKEND
+
+      - name: Build frontend image (local)
+        run: docker build -t ev2-frontend:ci ./FRONTEND/depilaciones-debby
+
+      - name: Scan backend image (fail on HIGH)
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ev2-backend:ci
+          args: --severity-threshold=high
+
+      - name: Scan frontend image (fail on HIGH)
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: ev2-frontend:ci
+          args: --severity-threshold=high
+
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@master
+
+      - name: Monitor backend image
+        run: snyk container monitor ev2-backend:ci
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Monitor frontend image
+        run: snyk container monitor ev2-frontend:ci
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   # ========================================
   # JOB 4: CODE QUALITY - SONARCLOUD
@@ -135,7 +195,7 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Necesario para SonarCloud
+          fetch-depth: 0
 
       - name: 🔍 SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
@@ -151,14 +211,14 @@ jobs:
             -Dsonar.javascript.lcov.reportPaths=BACKEND/coverage/lcov.info
 
   # ========================================
-  # JOB 5: BUILD & PUSH DOCKER IMAGES
+  # JOB 5: BUILD & PUSH DOCKER IMAGES (solo si seguridad y calidad OK)
   # ========================================
   build-and-push:
     name: 🐳 Build & Push Docker Images
     runs-on: ubuntu-latest
-    needs: [security-scan, code-quality]
+    needs: [security-scan, snyk-container, code-quality]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     permissions:
       contents: read
       packages: write
@@ -211,7 +271,7 @@ jobs:
           labels: ${{ steps.meta-frontend.outputs.labels }}
 
   # ========================================
-  # JOB 6: DEPLOY TO STAGING
+  # JOB 6: DEPLOY TO STAGING (simulado)
   # ========================================
   deploy-staging:
     name: 🚀 Deploy to Staging
@@ -230,10 +290,10 @@ jobs:
           echo "BACKEND_IMAGE=${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest" >> deployment/.env
           echo "FRONTEND_IMAGE=${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest" >> deployment/.env
 
-      - name: 🚀 Deploy with Docker Compose
+      - name: 🚀 Deploy with Docker Compose (simulado)
         run: |
           echo "Simulando despliegue a entorno staging..."
-          echo "Imágenes construidas y pusheadas exitosamente"
+          echo "Imágenes publicadas:"
           echo "Backend: ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest"
           echo "Frontend: ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest"
 
@@ -255,14 +315,13 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy-staging]
     if: always()
-
     steps:
       - name: 📊 Pipeline Summary
         run: |
           echo "### 📊 Pipeline Execution Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Tests ejecutados" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Análisis de seguridad completado" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Quality gates validados" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Imágenes Docker construidas" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Despliegue realizado" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Análisis de seguridad (deps + imágenes) con gates" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Quality gates (Sonar) validados" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Imágenes Docker publicadas" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Despliegue staging (simulado)" >> $GITHUB_STEP_SUMMARY
