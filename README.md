@@ -46,21 +46,6 @@
 | **IE5** | Orquestación Kubernetes | 9 manifiestos: Namespace, ConfigMap, Secret, 3 Deployments, 3 Services, HPA, Ingress | [k8s/](./k8s/) | ✅ **100%** |
 | **IE5** | Docker Compose | Orquestación de 3 servicios (mongodb, backend, frontend) con healthchecks y depends_on | [docker-compose.yml](./docker-compose.yml) | ✅ **100%** |
 
-### 🎓 Nota Final Proyectada
-
-```
-╔══════════════════════════════════════════╗
-║   EVALUACIÓN FINAL: 10/10 → 7.0/7.0     ║
-║                                          ║
-║   ✅ IE1 - Contenedores:         100%   ║
-║   ✅ IE2 - Tests automatizados:  100%   ║
-║   ✅ IE3 - Seguridad/Calidad:    100%   ║
-║   ✅ IE4 - CI/CD/Trazabilidad:   100%   ║
-║   ✅ IE5 - Orquestación:         100%   ║
-╚══════════════════════════════════════════╝
-```
-
----
 
 ## 📊 Resultados Finales
 
@@ -1528,13 +1513,6 @@ Stages: 2 (build + serve)
 ║     • Kubernetes (9 manifiestos)                ║
 ║     • HPA + Probes + Ingress                    ║
 ║                                                  ║
-╠══════════════════════════════════════════════════╣
-║                                                  ║
-║          NOTA FINAL: 10/10 → 7.0/7.0            ║
-║                                                  ║
-║              ⭐⭐⭐⭐⭐ PERFECTO ⭐⭐⭐⭐⭐            ║
-║                                                  ║
-╚══════════════════════════════════════════════════╝
 ```
 
 ### 📋 Checklist de Entrega
@@ -1657,13 +1635,12 @@ Si tienes preguntas sobre este proyecto:
 ### 👨‍💻 Desarrollado por
 
 **Sergio Araya Astudillo**  
-📧 [Tu Email]  
+📧 ser.arayaa@duocuc.cl  
 🎓 Evaluación 2 - DevOps CI/CD  
 📅 Noviembre 2025  
 
 ---
 
-Desarrollado con ❤️ y ☕ para la Evaluación 2 de DevOps  
 © 2025 Sergio Araya Astudillo - Todos los derechos reservados
 
 **"De 80% a 100% en un solo sprint"** 🚀
