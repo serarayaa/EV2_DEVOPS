@@ -45,7 +45,7 @@ jobs:
 
       # ✅ Guardar artifact de cobertura para SonarCloud
       - name: Upload coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: backend-coverage
           path: BACKEND/coverage/
@@ -83,7 +83,7 @@ jobs:
 
       # ✅ Guardar artifact de cobertura para SonarCloud
       - name: Upload frontend coverage artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: frontend-coverage
           path: FRONTEND/depilaciones-debby/coverage/
