@@ -52,7 +52,7 @@ jobs:
           retention-days: 1
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./BACKEND/coverage/lcov.info
           flags: backend
@@ -90,7 +90,7 @@ jobs:
           retention-days: 1
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           files: ./FRONTEND/depilaciones-debby/coverage/lcov.info
           flags: frontend
